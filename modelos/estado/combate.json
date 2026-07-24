@@ -1,0 +1,11 @@
+{
+  "ativo": false,
+  "rodada": 0,
+  "turno": null,
+  "cenario": "",
+  "mapa": { "imagem": null, "grid": { "cols": 0, "rows": 0, "escala_pes": 5 } },
+  "zonas": [],
+  "combatentes": [],
+  "fora": [],
+  "movimentos_do_jogador": []
+}

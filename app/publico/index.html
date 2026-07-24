@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mesa — campanha</title>
+<link rel="stylesheet" href="/estilo.css">
+</head>
+<body>
+<header id="topo">
+  <div class="marca">🎲 <span id="nome-campanha">Mesa</span></div>
+  <nav id="abas">
+    <button data-aba="ficha" class="aba">Ficha</button>
+    <button data-aba="chat" class="aba ativa">Mesa</button>
+    <button data-aba="combate" class="aba">Combate</button>
+  </nav>
+  <div class="acoes-topo">
+    <button id="btn-salvar" title="Pede um checkpoint ao mestre">salvar</button>
+    <button id="btn-recap" title="Pede um resumo do estado">recap</button>
+    <button id="btn-nova-sessao" title="Começa uma conversa nova (o estado fica nos arquivos)">nova sessão</button>
+  </div>
+</header>
+
+<main id="paineis">
+  <!-- ===================== FICHA ===================== -->
+  <section id="painel-ficha" class="painel">
+    <div id="ficha-vazia" class="vazio oculto">
+      <p>Nenhuma ficha ainda.</p>
+      <p class="dica">Peça ao mestre no chat: <em>“vamos criar meu personagem”</em>. Ele grava a ficha em <code>estado/personagem.json</code> e ela aparece aqui.</p>
+    </div>
+    <div id="ficha"></div>
+  </section>
+
+  <!-- ===================== CHAT ===================== -->
+  <section id="painel-chat" class="painel ativo">
+    <div id="mensagens"></div>
+    <div id="rodape-chat">
+      <div id="status-mestre" class="oculto"><span class="pena"></span> <span id="status-texto">o mestre escreve…</span></div>
+      <div id="rascunho" class="oculto">
+        <div class="rascunho-topo">
+          <span class="rascunho-titulo">🎲 rascunho — <span id="rascunho-conta">0</span> rolagem(ns)</span>
+          <span class="rascunho-botoes">
+            <button id="btn-rascunho-enviar" class="pill-botao">enviar tudo</button>
+            <button id="btn-rascunho-limpar" class="pill-botao">limpar</button>
+          </span>
+        </div>
+        <ol id="rascunho-lista"></ol>
+        <p class="rascunho-dica">As rolagens ficam guardadas aqui. O mestre só vê quando você enviar.</p>
+      </div>
+      <div id="linha-entrada">
+        <button id="btn-rascunho-modo" title="Acumular rolagens num rascunho e enviar tudo de uma vez (multiataque)">🎲+</button>
+        <button id="btn-off" title="Alterna conversa fora do personagem">off</button>
+        <textarea id="entrada" rows="1" placeholder="O que você faz?"></textarea>
+        <button id="btn-enviar" title="Enviar">➤</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== COMBATE ===================== -->
+  <section id="painel-combate" class="painel">
+    <div id="sem-combate" class="vazio">
+      <p>⚔️ Sem combate ativo.</p>
+      <p class="dica">Quando a iniciativa rolar, a ordem, o mapa e os tokens aparecem aqui.</p>
+      <label class="botao-arquivo">enviar mapa/token ao mestre
+        <input type="file" id="upload" accept="image/*">
+      </label>
+      <p class="dica" id="upload-ok"></p>
+    </div>
+    <div id="combate" class="oculto">
+      <div id="combate-cabecalho"></div>
+      <button id="btn-mapa-tab" class="pill-botao" title="Abre o mapa grande, com iniciativa e vida, em uma nova aba">⛶ abrir mapa em nova aba</button>
+      <div id="mapa-caixa"></div>
+      <ol id="iniciativa"></ol>
+      <label class="botao-arquivo">enviar mapa/token ao mestre
+        <input type="file" id="upload2" accept="image/*">
+      </label>
+    </div>
+  </section>
+</main>
+
+<template id="tpl-msg">
+  <div class="msg"><div class="autor"></div><div class="conteudo"></div></div>
+</template>
+
+<script src="/app.js"></script>
+</body>
+</html>

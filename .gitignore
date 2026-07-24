@@ -1,0 +1,33 @@
+# =============================================================
+#  Este repositório publica o FRAMEWORK, não a sua campanha.
+#  Os modelos em branco ficam em modelos/ e são copiados para cá
+#  na primeira execução (veja o README).
+# =============================================================
+
+# ---- sua campanha (pessoal, nunca versionado) ----
+/CAMPANHA.md
+/mundo/
+/estado/
+/sessoes/
+/campanhas-passadas/
+/.sessao-app.json
+
+# ---- conteúdo protegido da Wizards of the Coast ----
+# Nada disto pode ser redistribuído. Tudo é regenerável localmente:
+#   python ferramentas/5et.py baixar
+/ferramentas/dados-5et/
+#   python ferramentas/aventura.py importar <ID>   (texto integral de módulos)
+/aventuras/
+#   python ferramentas/5et.py mapa|token ...       (mapas e tokens oficiais)
+/midia/
+
+# ---- notas e rascunhos pessoais ----
+/IDEIAS-HISTORIAS.md
+/elementais-fortes.*
+
+# ---- sistema ----
+__pycache__/
+*.py[cod]
+node_modules/
+.DS_Store
+*.swp
