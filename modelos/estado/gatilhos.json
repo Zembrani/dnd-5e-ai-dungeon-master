@@ -1,0 +1,5 @@
+{
+  "_leia_me": "Ledger APPEND-ONLY. Nunca reescreva nem apague resoluções — é o que impede um arco de sumir junto com a sobrescrita de atual.md. Escreva com: python3 ferramentas/radar.py resolver <id> disparado|pulado|adiado \"nota\"",
+  "resolucoes": [],
+  "manuais": []
+}

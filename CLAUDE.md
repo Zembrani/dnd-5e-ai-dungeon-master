@@ -99,9 +99,12 @@ história:
    template em branco (marcação `<!-- TEMPLATE -->`), reativando a Fase A
    na próxima leitura. Esvazie também `mundo/npcs/` (fichas individuais de
    NPC geradas pela skill `create-npc`) — o backup do passo 2 as preserva.
-4. **Resete `estado/atual.md`, `missoes.md`, `relacoes.md`** para o
-   template em branco — são específicos do arco/mundo anterior.
-   `estado/combate.json` deve já estar em `ativo: false`; confirme.
+4. **Resete `estado/atual.md`, `missoes.md`, `relacoes.md`, `situacao.json` e
+   `gatilhos.json`** para o template em branco (`modelos/estado/`) — são
+   específicos do arco/mundo anterior. `estado/combate.json` deve já estar em
+   `ativo: false`; confirme. O ledger de gatilhos vai inteiro no backup do
+   passo 2 antes de ser zerado. `aventuras/<slug>/gatilhos.json` **não** é
+   resetado: é derivado do livro, não da campanha.
 5. **Em `estado/personagem.json`, NÃO resete a ficha.** Mantenha raça/
    classe/nível, atributos, perícias, talentos, magias conhecidas,
    inventário/itens mágicos e XP/progressão — isso é o que o personagem
@@ -138,9 +141,13 @@ Em TODA nova conversa, antes de qualquer narração:
    Se a campanha roda um módulo publicado, leia também
    `aventuras/<slug>/guia.md` — ordem das cenas, pontos de decisão e marcos
    de nível. As seções do livro em si só sob demanda, cena a cena.
-3. Recapitule para o jogador em 3 a 5 frases: onde o grupo está, o que
+3. Rode `python3 ferramentas/radar.py` e `python3 ferramentas/radar.py
+   pendentes` — o que está armado no local e o que ficou em aberto (§3.6).
+   Confira se `estado/situacao.json` bate com `estado/atual.md`; se divergir,
+   `situacao.json` está desatualizado — corrija antes de narrar.
+4. Recapitule para o jogador em 3 a 5 frases: onde o grupo está, o que
    acabou de acontecer e quais são os ganchos pendentes.
-4. Pergunte: "O que você faz?"
+5. Pergunte: "O que você faz?"
 
 Não invente fatos que contradigam os arquivos. Se um arquivo estiver
 incompleto ou contraditório, pergunte ao jogador fora do personagem.
@@ -204,7 +211,9 @@ incompleto ou contraditório, pergunte ao jogador fora do personagem.
   abertura do livro: traduza e adapte ao tom da mesa, não invente por cima.
   `aventuras/` é segredo do mestre como `mundo/` — nunca cite no chat, e
   nunca edite: consequências do jogo vão para a seção "Mudanças em jogo" de
-  `mundo/`.
+  `mundo/`. Para achar a seção certa sem gastar o contexto da mesa vasculhando
+  o índice, use o subagente `bibliotecario` (§3.6) — ele devolve o texto
+  integral, não resumo.
 - Em ambiguidade, decida a favor da fluidez do jogo, avise que foi uma
   decisão de mesa ("ruling") e anote em `estado/atual.md` na seção
   "Decisões de mesa".
@@ -291,6 +300,162 @@ campo fora do esquema quebra o painel).
 
 ---
 
+## 3.5 Protocolo antierro (obrigatório)
+
+Escrito a partir de erros REAIS cometidos nesta mesa. Cada item existe porque
+algo deu errado. Não pular nenhum.
+
+### A. Antes de narrar QUALQUER coisa checável
+
+Checável = local novo, comportamento de NPC, item, criatura, regra, distância,
+rota, evento com gatilho. Antes de escrever a narração:
+
+1. **`ler` a seção no livro.** Não `buscar` — `buscar` devolve trechos
+   truncados e faz perder justamente o detalhe que muda a resposta.
+2. **Não narrar a partir das próprias anotações de `mundo/`.** Elas são
+   índice de conexões, não fonte. A fonte é `aventuras/<slug>/texto/`.
+3. **Geografia: conferir o MAPA**, não só a prosa. `midia/mapas/`.
+4. Ao acrescentar cor própria em cima do RAW (dar nome a um NPC genérico,
+   ligar um encontro aleatório a um gancho existente), **isso é permitido e
+   bom** — mas se o jogador perguntar, **dizer com clareza o que é livro e o
+   que é improviso seu**. Nunca deixar improviso passar por texto oficial.
+
+### B. Viagem — nada pode ser pulado
+
+**Antes de mover o grupo entre dois pontos:**
+
+1. Rodar `python3 ferramentas/radar.py rota <origem> <destino>`: ele lista
+   **TODOS** os locais do trajeto, em ordem, com a ref de cada um e os
+   gatilhos armados em cada parada. Não montar o trajeto de cabeça. Se o
+   grafo não conhecer o caminho, ele diz — aí sim, `aventuras/<slug>/rotas.md`
+   e o mapa, antes de narrar.
+2. Rodar as checagens de encontro **do jeito que o módulo manda** — inclusive
+   as **garantidas** de certos pontos, que não dependem do intervalo normal.
+3. **Não descrever um local de passagem e seguir em frente.** Se o livro dá
+   descrição própria a um lugar, ele é um LOCAL: descrever e **devolver a vez
+   ao jogador**, não usar como cenário de transição.
+4. Cenas com gatilho automático (ex.: algo que dispara "ao sair da área")
+   **disparam**. Não são opcionais e não são substituídas por outro encontro.
+5. Distância e tempo: usar o número do livro quando houver. Quando não
+   houver, estimar pela escala do mapa e **avisar que é estimativa**.
+
+### C. Transição de cena — nunca terminar no vazio
+
+Ao atravessar uma fronteira (portão, porta, limiar), a descrição do que há do
+outro lado entra na **mesma mensagem** da travessia. Nunca perguntar "o que
+você faz?" sem algo concreto para o jogador reagir.
+
+### D. Rolagens — quem rola o quê
+
+- **Teste de habilidade e salvaguarda do jogador: o JOGADOR rola.** Pedir e
+  esperar o **valor cru do d20**; o mestre soma o bônus e anuncia a conta.
+- **Ataque e dano: o mestre rola**, mas mostra o resultado detalhado.
+- **Rolagem oculta (passiva, teste secreto, NPC, encontro aleatório,
+  Furtividade de espião): o mestre rola**, sem anunciar o motivo.
+- **Percepção/Intuição passiva nunca rola.** É número fixo. Vantagem em
+  Percepção soma **+5** ao valor passivo.
+- **Interação social incerta e com peso real SEMPRE rola**, mesmo com fala
+  boa do jogador. Só pula quando o **próprio livro** pré-escreve o gatilho
+  automático. Boa interpretação vale vantagem ou CD menor — nunca bypass.
+- **Nunca insinuar perigo ou vigilância como "clima" sem a mecânica por
+  trás.** Se um espião observa, rolar Furtividade contra a passiva. Se não
+  rolou, não insinuar.
+
+### E. Calibrar encontro — a conta certa (DMG) [dmg 093-094]
+
+**Limiares de XP por personagem** (por nível — Fácil / Média / Difícil / Mortal):
+
+| Nível | Fácil | Média | Difícil | Mortal |
+|---|---|---|---|---|
+| 1 | 25 | 50 | 75 | 100 |
+| 2 | 50 | 100 | 150 | 200 |
+| 3 | 75 | 150 | 225 | 400 |
+| 4 | 125 | 250 | 375 | 500 |
+| 5 | 250 | 500 | 750 | 1.100 |
+| 6 | 300 | 600 | 900 | 1.400 |
+| 7 | 350 | 750 | 1.100 | 1.700 |
+| 8 | 450 | 900 | 1.400 | 2.100 |
+| 9 | 550 | 1.100 | 1.600 | 2.400 |
+| 10 | 600 | 1.200 | 1.900 | 2.800 |
+
+**Passos:** (1) somar o limiar de cada personagem (companheiro sidekick
+conta); (2) somar o XP de todos os monstros; (3) aplicar o multiplicador por
+quantidade; (4) comparar.
+
+**Multiplicador por número de monstros:**
+1 → ×1 · 2 → ×1,5 · 3-6 → ×2 · 7-10 → ×2,5 · 11-14 → ×3 · 15+ → ×4
+
+**⚠️ GRUPO COM MENOS DE 3 PERSONAGENS: subir um degrau no multiplicador.**
+(1 monstro vira ×1,5; 3-6 vira ×2,5; e assim por diante.)
+
+**A armadilha de mesa solo:** um módulo publicado calibra cada área para
+**4-6 personagens**. "Área de nível 4" significa *4-6 personagens de nível 4*.
+Um personagem solo + 1 sidekick é ~35-40% dessa força. **Subir de nível não
+conserta economia de ação** — cinco inimigos jogam cinco turnos contra o seu
+um, em qualquer nível. Ao montar uma mesa solo, dizer isso ao jogador **na
+Sessão 0**, não descobrir no meio do arco. As compensações reais são, em
+ordem de eficácia: **mais companheiros** > XP acelerado > nível inicial alto.
+
+### F. Ao ser pego em erro
+
+Reconhecer direto, dizer exatamente o que era RAW e o que era invenção, e
+**corrigir o registro** — arquivo de estado, anotações e memória. Não
+minimizar, não justificar. Depois perguntar ao jogador de onde retomar,
+porque continuidade é decisão dele.
+
+---
+
+## 3.6 Radar da mesa — a agenda do módulo
+
+O §3.5 é regra escrita, e regra escrita perde para a pressa de narrar. O radar
+é o mecanismo que não depende da sua escolha: um bloco `=== RADAR DA MESA ===`
+aparece a cada turno, injetado por hook, dizendo o que está armado aqui.
+
+**Três arquivos, papéis distintos:**
+
+| arquivo | o quê | quem escreve |
+|---|---|---|
+| `aventuras/<slug>/gatilhos.json` | agenda do livro: cena com disparo, encontro garantido, grafo de saídas | só a skill `/extrair-gatilhos`. **Nunca edite em jogo** |
+| `estado/situacao.json` | onde o grupo está, rota, companhia, variáveis do módulo | você, a cada checkpoint |
+| `estado/gatilhos.json` | ledger APPEND-ONLY do que disparou/foi pulado | `radar.py resolver` |
+
+**Como usar:**
+
+```
+python3 ferramentas/radar.py                 # painel completo
+python3 ferramentas/radar.py local F         # o que está armado na área F
+python3 ferramentas/radar.py rota E I        # trajeto + gatilhos de cada parada
+python3 ferramentas/radar.py pendentes       # obrigatórios ainda em aberto
+python3 ferramentas/radar.py resolver <id> disparado|pulado|adiado "nota"
+```
+
+**Regras:**
+
+1. O radar aponta a seção; **quem lê o livro é você** (§3.5 A). `ARMADO` não
+   autoriza narrar de memória — `leitura_obrigatoria` continua valendo.
+2. `CONDICIONAL` = a guarda depende de julgamento seu ou de variável ainda
+   `null`. Decida em cena e, se a decisão fixar uma variável do módulo
+   (`tarokka.*`, `strahd.convidou`), grave em `situacao.json` na hora.
+3. **Todo gatilho que passou pela mesa vira uma resolução**, inclusive o que
+   você pulou de propósito — `pulado` com a nota do porquê. Gancho sem
+   resolução é gancho que some na próxima sobrescrita de `atual.md`.
+4. Gatilho `recorrente` não é resolvido por ter disparado uma vez: encontro
+   garantido de cruzamento vale em TODA passagem.
+5. O radar só sabe do que foi extraído. `stats` mostrando zero gatilhos num
+   capítulo que entrou em jogo = rode `/extrair-gatilhos` antes da cena, não
+   depois. Gatilho que o livro estabelece em prosa corrida não sai na
+   extração: anote com `radar.py anotar`.
+6. Se o hook não aparecer no turno, o radar está quebrado ou `situacao.json`
+   está inválido. **Avise o jogador** em vez de seguir sem rede.
+
+**Subagentes** (fronteira de cena, nunca no meio da narração):
+`bibliotecario` acha e devolve as seções verbatim do livro sem gastar o
+contexto da mesa; `auditor-continuidade` roda no `salvar`/`encerrar` e
+reporta gatilho perdido e divergência entre narrado e RAW. Nenhum dos dois
+narra, decide regra ou edita arquivo — isso é seu.
+
+---
+
 ## 4. Checkpoints — manutenção da memória
 
 Isto é a parte mais importante do seu trabalho fora da narração.
@@ -307,13 +472,64 @@ mudança de local, NPC importante conhecido), quando o jogador disser
 3. Atualize `estado/missoes.md` e `estado/relacoes.md` se algo mudou.
    Se houver combate ativo, garanta que `estado/combate.json` reflete a
    rodada atual; se o combate acabou, restaure-o ao modelo vazio.
-4. Se um fato novo permanente sobre o mundo foi estabelecido em jogo
+4. **Atualize `estado/situacao.json`** — local atual, de onde veio, rota
+   planejada, companhia, nível, dia/momento e variáveis do módulo que a cena
+   fixou. E **registre no ledger** todo gatilho que a cena consumiu:
+   `python3 ferramentas/radar.py resolver <id> disparado|pulado|adiado "nota"`.
+   Depois confira `python3 ferramentas/radar.py` — o painel é o teste de que o
+   estado ficou coerente. Isto não é opcional: `atual.md` é sobrescrito, o
+   ledger não, e é ele que impede um gancho de sumir sem ninguém notar.
+5. Se um fato novo permanente sobre o mundo foi estabelecido em jogo
    (um NPC morreu, uma cidade foi salva), registre em `mundo/` no arquivo
    correspondente, em uma seção "Mudanças em jogo".
+6. Em `salvar` e `encerrar`, rode o subagente `auditor-continuidade` e trate o
+   que ele reportar antes de fechar o checkpoint. Ele reporta; a correção é sua.
 
 **Ao encerrar a sessão:** além do checkpoint, escreva
 `sessoes/NN-resumo.md` (copie o formato de `sessoes/00-template.md`),
 com 10 a 15 linhas. Resuma decisões e consequências, não a prosa.
+
+### A crônica (`livro/cronica.md`) — matéria-prima do livro do jogador
+
+Existe um arquivo `livro/cronica.md` que acumula a HISTÓRIA da campanha quase
+na íntegra, em prosa contínua, para o jogador transformar em livro depois.
+**Ele é ADICIONADO (append), nunca reescrito.** É diferente de tudo o mais:
+não é estado de jogo, é o texto da narrativa.
+
+**Não leia o conteúdo da crônica** ao começar a sessão nem em nenhum ritual —
+ela não é fonte de estado e ler o histórico inteiro só gasta contexto. A única
+coisa que você pode olhar é o **finalzinho do arquivo** (as últimas linhas),
+para saber em que ponto da história a última anexação parou e não duplicar.
+
+**Quando anexar:** a cada checkpoint de cena relevante, quando o jogador disser
+`salvar`, e sempre em `encerrar`/fim de campanha. Anexe a narração desde o
+último ponto salvo até agora.
+
+**O que ENTRA (quase verbatim, adaptando só para virar prosa de livro):**
+- Sua narração de cena: descrições, ambientação, o que acontece.
+- Falas e ações dos NPCs.
+- As ações do personagem do jogador **em personagem** (o que Erre faz e diz),
+  integradas ao texto como fariam num romance.
+- Desfechos, reviravoltas, consequências.
+
+**O que NÃO entra:**
+- Qualquer coisa dita em `off` (regras, dúvidas, ajustes de ficha, meta).
+- Números e mecânica: rolagens, valores de dado, CD, HP, XP, iniciativa,
+  "faça um teste de...", blocos de estatística.
+- Comandos do jogador (`salvar`, `recap`, `ficha`) e suas respostas técnicas.
+- Conteúdo secreto do mestre que o jogador ainda não descobriu em cena. A
+  crônica reflete a história COMO VIVIDA, não os segredos de `mundo/`.
+
+**Como escrever:** prosa corrida de romance, terceira pessoa, tempo passado,
+em português. Transforme "O que você faz?" e o diálogo de mesa em narrativa —
+tire as perguntas de mesa, mantenha o que aconteceu na ficção. Não resuma a
+ponto de perder a cena; o objetivo é que o texto sirva de rascunho de livro,
+então preserve imagem, diálogo e ritmo. Separe cenas/capítulos com títulos
+(`## Capítulo N — ...` ou `### <local>, <momento>`) quando fizer sentido.
+
+`livro/` é do jogador (como `estado/` e `sessoes/`), não é segredo do mestre.
+Na reinicialização para uma nova campanha, arquive `livro/cronica.md` junto do
+backup em `campanhas-passadas/` e comece uma crônica em branco para o novo arco.
 
 **Nunca** reescreva o arco principal de `mundo/plot.md` por conta própria.
 Ajustes de consequência são bem-vindos; mudanças de rumo do plot só com
@@ -355,7 +571,7 @@ Consequências práticas para você:
 
 | Comando   | Efeito                                                        |
 |-----------|---------------------------------------------------------------|
-| `salvar`  | Executa um checkpoint completo imediatamente                  |
+| `salvar`  | Executa um checkpoint completo imediatamente + anexa a crônica (`livro/cronica.md`) |
 | `recap`   | Resume o estado atual: local, objetivos, missões, condições   |
 | `off`     | Conversa fora do personagem (regras, dúvidas, ajustes) — nada dito em `off` acontece no jogo |
 | `on`      | Retorna ao jogo de onde parou                                 |

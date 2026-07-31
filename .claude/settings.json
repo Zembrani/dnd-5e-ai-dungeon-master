@@ -1,0 +1,27 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/ferramentas/radar.py\" --hook",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  },
+  "permissions": {
+    "allow": [
+      "Bash(python3 ferramentas/roll.py:*)",
+      "Bash(python3 ferramentas/radar.py:*)",
+      "Bash(python3 ferramentas/gatilhos.py:*)",
+      "Bash(python3 ferramentas/aventura.py ler:*)",
+      "Bash(python3 ferramentas/aventura.py indice:*)",
+      "Bash(python3 ferramentas/aventura.py buscar:*)",
+      "Bash(python3 ferramentas/aventura.py importadas)",
+      "Bash(python3 ferramentas/5et.py:*)"
+    ]
+  }
+}

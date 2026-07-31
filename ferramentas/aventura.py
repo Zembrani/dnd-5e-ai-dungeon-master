@@ -257,32 +257,37 @@ def _quebrar(no: dict, cap: str, prof: int) -> list[dict]:
 # --------------------------------------------------------------------------
 # importar
 # --------------------------------------------------------------------------
-def _catalogo() -> list[dict]:
-    return json.loads(_get(f"{BASE}/adventures.json"))["adventure"]
+def _catalogo(tipo: str = "adventure") -> list[dict]:
+    arq = "adventures.json" if tipo == "adventure" else "books.json"
+    return json.loads(_get(f"{BASE}/{arq}"))[tipo]
 
 
-def listar(filtro: str) -> None:
+def listar(filtro: str, tipo: str = "adventure") -> None:
+    rotulo = "aventura" if tipo == "adventure" else "livro"
     alvo = _norm(filtro)
     achou = 0
-    for a in _catalogo():
+    for a in _catalogo(tipo):
         if alvo and alvo not in _norm(a["name"]) and alvo not in _norm(a["id"]):
             continue
         achou += 1
         print(f"  {a['id']:14} {a['name']}")
     if not achou:
-        print(f"Nenhuma aventura com '{filtro}'.")
+        print(f"Nenhum(a) {rotulo} com '{filtro}'.")
     else:
-        print(f"\nImporte com: python ferramentas/aventura.py importar <ID>")
+        cmd = "importar" if tipo == "adventure" else "importar-livro"
+        print(f"\nImporte com: python ferramentas/aventura.py {cmd} <ID>")
 
 
-def importar(aid: str) -> None:
-    catalogo = {a["id"].lower(): a for a in _catalogo()}
+def importar(aid: str, tipo: str = "adventure") -> None:
+    rotulo = "Aventura" if tipo == "adventure" else "Livro"
+    lcmd = "listar" if tipo == "adventure" else "livros"
+    catalogo = {a["id"].lower(): a for a in _catalogo(tipo)}
     meta = catalogo.get(aid.lower())
     if not meta:
-        sys.exit(f"Aventura '{aid}' não existe. Liste com: "
-                 "python ferramentas/aventura.py listar")
+        sys.exit(f"{rotulo} '{aid}' não existe. Liste com: "
+                 f"python ferramentas/aventura.py {lcmd}")
     print(f"Baixando {meta['name']} [{meta['id']}]...")
-    bruto = _get(f"{BASE}/adventure/adventure-{meta['id'].lower()}.json")
+    bruto = _get(f"{BASE}/{tipo}/{tipo}-{meta['id'].lower()}.json")
     dados = json.loads(bruto)
 
     slug = _slug(meta["id"])
@@ -482,10 +487,16 @@ def main() -> None:
 
     if cmd == "listar":
         listar(" ".join(resto))
+    elif cmd == "livros":
+        listar(" ".join(resto), tipo="book")
     elif cmd == "importar":
         if not resto:
             sys.exit("Informe o ID. Ex.: python aventura.py importar CoS")
         importar(resto[0])
+    elif cmd == "importar-livro":
+        if not resto:
+            sys.exit("Informe o ID. Ex.: python aventura.py importar-livro DMG")
+        importar(resto[0], tipo="book")
     elif cmd == "importadas":
         importadas()
     elif cmd == "indice":

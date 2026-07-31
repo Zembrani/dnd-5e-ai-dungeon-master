@@ -100,7 +100,24 @@ ramo leva — com a referência da seção de destino>
 <itens, NPCs ou informações que o livro assume que o grupo já tem>
 ```
 
-## Passo 6 — mapas
+## Passo 6 — a agenda de gatilhos (obrigatório)
+
+O `guia.md` é prosa que você escolhe reler; a agenda é mecanismo que roda
+sozinho. Rode a skill `/extrair-gatilhos <slug>` para os capítulos do começo
+do arco (não o livro inteiro — a extração é incremental, capítulo a capítulo,
+conforme entram em jogo).
+
+Ela compila `aventuras/<slug>/gatilhos.json`: cenas com disparo automático,
+encontros garantidos, revelações condicionais e o grafo de saídas do mapa. É
+disso que o radar (`ferramentas/radar.py`) vive, e é o que impede a cena "ao
+sair da área" de sumir no meio de uma viagem.
+
+Depois, crie `estado/situacao.json` a partir de `modelos/estado/situacao.json`:
+`aventura` = slug, `local_atual` = onde o grupo começa, e uma entrada em
+`variaveis` para cada variável que apareceu em guarda de gatilho (`null`
+enquanto a mesa não a resolver). Confira com `python3 ferramentas/radar.py`.
+
+## Passo 7 — mapas
 
 Baixe os mapas dos primeiros capítulos já agora, versão do jogador:
 
@@ -113,7 +130,7 @@ Anote em `mundo/locais.md` qual mapa serve cada local, para o
 `estado/combate.json` apontar direto na hora da briga. Nunca revele ao jogador
 o nome do arquivo nem de que aventura ele veio.
 
-## Passo 7 — fechar
+## Passo 8 — fechar
 
 Diga ao jogador, em 3 linhas e sem spoiler: que a preparação está pronta, em
 que ponto ele começa e o que ele sabe do mundo como personagem. Depois siga o
@@ -122,7 +139,10 @@ que ponto ele começa e o que ele sabe do mundo como personagem. Depois siga o
 
 ## Em jogo, depois da importação
 
-- Cena nova do módulo → `buscar` o local, `ler` a seção, **então** narrar.
+- Cena nova do módulo → `radar.py local <área>` para saber o que está armado,
+  `ler` a seção inteira, **então** narrar. Capítulo que entra em jogo sem
+  gatilhos extraídos (`gatilhos.py stats <slug>`) → rode `/extrair-gatilhos`
+  antes da cena.
 - Texto marcado `> **[LER EM VOZ ALTA]**` é a narração de abertura do livro:
   traduza para o português e adapte ao tom da mesa, mas não invente por cima.
 - Criatura que entra em cena → `5et.py criatura "<nome>"` para o bloco oficial,

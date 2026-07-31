@@ -76,6 +76,32 @@ um LLM narrar um módulo "de memória" e trocar aposentos e nomes.
 O texto importado fica em `aventuras/`, que é ignorado pelo git. Veja
 [Conteúdo protegido](#conteúdo-protegido).
 
+### O radar da mesa
+
+Consultar o livro é caro no meio de uma cena, então a decisão de consultar
+sempre perde para a de continuar narrando — e é assim que um módulo perde
+gancho, cena obrigatória e às vezes um arco inteiro. Regra escrita não
+resolve isso; mecanismo resolve.
+
+`/extrair-gatilhos` compila o módulo numa **agenda**: cada cena com disparo
+automático ("ao sair da área…"), encontro garantido, revelação condicional e
+o grafo de saídas do mapa, cada uma com a citação literal do livro que a
+estabelece — a validação rejeita gatilho cuja citação não exista no texto, de
+modo que nenhum é inventado.
+
+Daí em diante `ferramentas/radar.py` cruza essa agenda com o estado da
+campanha e injeta, **a cada turno**, o que está armado no local atual e qual
+seção precisa ser lida antes de narrar. Sem LLM no meio: é comparação de
+arquivo. O que já disparou (ou foi pulado de propósito) vai para um ledger
+append-only em `estado/gatilhos.json`, que ao contrário de `estado/atual.md`
+nunca é sobrescrito.
+
+```bash
+python ferramentas/radar.py                 # o que está armado aqui
+python ferramentas/radar.py rota E I        # trajeto + gatilhos de cada parada
+python ferramentas/radar.py pendentes       # obrigatórios ainda em aberto
+```
+
 ## Comandos na mesa
 
 | Comando      | Efeito |
@@ -92,17 +118,27 @@ O texto importado fica em `aventuras/`, que é ignorado pelo git. Veja
 |-------|-----------|
 | `/create-npc` | Gera um NPC completo — voz, objetivos, falhas, segredos com CD, humor atual — rolando nas tabelas do Livro do Mestre o que não for informado. |
 | `/importar-aventura` | Prepara o mestre para rodar um módulo oficial publicado. |
+| `/extrair-gatilhos` | Compila um módulo importado na agenda de gatilhos que alimenta o radar da mesa. |
+
+Dois subagentes trabalham na fronteira das cenas, sem gastar o contexto da
+mesa: `bibliotecario` acha e devolve as seções do livro na íntegra (nunca
+resume, nunca opina), e `auditor-continuidade` roda nos checkpoints e reporta
+gatilho perdido e divergência entre o que foi narrado e o que o livro diz.
 
 ## Estrutura
 
 ```
 CLAUDE.md              contrato de comportamento do mestre
 .claude/skills/        skills do projeto
+.claude/agents/        subagentes (bibliotecário, auditor de continuidade)
+.claude/settings.json  hook que injeta o radar a cada turno
 app/                   servidor local + interface de 3 painéis
 app/ESQUEMAS.md        esquema dos JSONs que o app renderiza
 ferramentas/roll.py    dados honestos
 ferramentas/5et.py     consulta às regras oficiais
 ferramentas/aventura.py  importa e consulta aventuras publicadas
+ferramentas/gatilhos.py  compila e valida a agenda de gatilhos do módulo
+ferramentas/radar.py     o que está armado aqui e o que ler antes de narrar
 modelos/               modelos em branco de uma campanha nova
 
            ↓ criados a partir de modelos/, ignorados pelo git ↓
